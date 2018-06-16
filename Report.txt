@@ -1,0 +1,19 @@
+Inference for Insurance Claim
+1  Introduction
+Car accident happens every day. Insurance companies must improve their claims service to attract their customers. In this report, we build a model to help insurance companies to make a prediction for the cost of every claims. Regression Tree and Random Forest algorithms are applied to build models respectively. We will choose the best model from these two algorithms to recommend. Our interest is only to find the best model. Hence we will not interpret the model or the related parameters. We will focus on comparing the standard error of the models.
+2  Data Description
+Data set is collected by Allstate, an insurance company. There are 188318 observations. The data set includes xx categorical variables and xx numeric variables. The target variable is numeric. Hence, regression models are applied. Categorical variables are several levels, valued as letters, A, B, C ect. Some categorical variables have up to 12 levels.
+3  Method
+Regression Tree is nonlinear predictive model, which is a specific decision tree (classification and regression tree (CART)) when the target variable is continuous. In tree model, leaves represent class labels and branches represent the functional relation of predictors that splits the parent of the child nodes. There are many specific decision tree algorithms, such as, ID3, C4.5, CART,CHAID and MARS. In this paper, we are not going to introduce the algorithm. We are interested in the result. We applied rpart package, which applies CART, in R to perform regression tree.
+Random Forest is constructed by several decision trees, default 500. Ensemble method is utilized on these trees to make a better prediction. There are two parameters should be set by the users. The first is the number of variables chosen for each split. It is default to be the square root of the total number of the predictors. The other should be set is the number of trees to be built. In this paper, we are going to build 1000 trees. In R, package randomForest could not handle over 53 categorical variables. We will use h2o.randomForest. It is slower but it can handle over 53 categorical variables.
+We divide the data into two parts, 67% of the data to be training data set and 33% of the data to be testing data set. Because the observation number is very large, 188318, there is no need to use cross validation. Directly calculate the standard error. Standard error is a method to exam the accuracy of the model. Smaller is better.
+4  Result
+Method	     Rpart	  H2o.randomForest
+Error	     2497	  2049
+Error rate   0.0402   0.0330
+Table 4.1 predictive errors
+
+Random Forest is better than single regression tree, because random forest generates small error. We will suggest insurance company to apply random forest model to predict the loss for each claim.
+Rpart generate a single tree, while H2o.randomeForest generate several trees. Random forest utilizes ensemble method to generate better error. Liner regression could not directly apply on this data set. Because some categorical variables have up to 12 levels and some levels are missing. Before liner regression, we can group some rare levels. Additionally, other non-parameter regression method, such as spline regression and kernel regression, can be applied. These will be future study.
+
+

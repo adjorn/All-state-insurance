@@ -1,0 +1,45 @@
+data=read.csv("F:\\course\\576\\allstate\\train.csv")
+set.seed(42)
+n=nrow(data)
+train.id=sample(1:n,size=0.67*n,replace=F)
+arr=1:n
+test.id=arr[-train.id]
+train=data[train.id,]
+test=data[test.id,]
+target="loss"
+predictors=names(data)[names(data)!=target&names(data)!="ID"&names(data)!="IID"&names(data)!="id"&names(data)!="iid"]
+err=function(test,pred)  sqrt((sum((test[,target]-pred)**2))/nrow(test))
+
+##generate the optimal tree.
+tree.rpart=function(data,y,x,method="class"){
+require(rpart)
+if(method=="class") data[,y]=as.factor(data[,y])
+data$y=data[,y]  ##creat a new col of target to ajust for formula.
+fit=rpart(formula=y~.,data=data[,c(x,"y")],method=method,control=rpart.control(minsplit=5))
+  ind.min=which.min(fit$cptable[,"xerror"])
+  xerror=fit$cptable[1:ind.min,"xerror"]
+  xer_std=xerror[ind.min]+fit$cptable[ind.min,"xstd"]
+  if(xerror[1]<xer_std) cp=fit$cptable[1,"CP"] else{
+     ind_f=max(which(xerror<=xer_std))
+     ind_up=min(which(xerror>=xer_std))
+     cp=sqrt(fit$cptable[ind_f,"CP"]*fit$cptable[ind_up,"CP"])
+     }
+  fit_prune=prune(fit,cp)
+  return(fit_prune)
+ }
+rp2_fit=tree.rpart(train,y=target,x=predictors,method="anova")
+rp2_pred=predict(rp2_fit,test)
+rp2_error=err(test,rp2_pred)
+rp2_error
+
+library(h2o)
+h=h2o.init()
+h2o.shutdown()
+h2o.init(nthreads=-1)
+training_f=as.h2o(train)
+rf_fit=h2o.randomForest(x=predictors,y=target,training_frame=training_f,ntree=1000)
+test_f=as.h2o(test)
+rf_pred=h2o.predict(rf_fit,newdata=test_f)
+rf_pred=as.vector(rf_pred)
+rf_error=err(test,rf_pred)
+rf_error
