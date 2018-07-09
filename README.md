@@ -1,1 +1,2 @@
 # All state insurance
+# Car accident happens every day. Insurance companies must improve their claims service to attract their customers. In this paper, we build a model to help insurance companies to make a prediction for the cost of every claims. Regression Tree and Random Forest algorithms are applied to build models respectively. We will choose the best model from these two algorithms to recommend. Our interest is only to find the best model. Hence we will not interpret the model or the related parameters. We will focus on comparing the standard error of the models.
